@@ -1,4 +1,7 @@
 const express =  require("express")
+require("dotenv").config();
+
+
 
 const {body } = require("express-validator")
 const {validationSchema} = require('../middlewares/validationSchema')

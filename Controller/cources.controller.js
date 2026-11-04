@@ -1,19 +1,27 @@
 const {body , validationResult, param} = require("express-validator")
 let {Courses} = require('../data/Cources')
+const pool = require('../database/dp')
 
-const GetAllCourses =(req ,res)=>{
-    res.json(Courses)
+
+const GetAllCourses = async (req ,res)=>{
+     const result = await pool.query("SELECT * FROM COURSE");
+    res.json(result.rows)
 }
 
-const GetSingleCourse =  (req ,res)=>{
+const GetSingleCourse = async (req ,res)=>{
     const CoursesId = +req.params.CourseId;
-    const course = Courses.find((co)=> co.id === CoursesId );
+    // const course = Courses.find((co)=> co.id === CoursesId );
+    const result = await pool.query(
+    "SELECT id, title, price FROM course WHERE id = $1",
+    [CoursesId]
+);
 
-    if (!course) {
+    // if (!result) {
 
-        return res.status(404).json({mas:"Cources Nout Found"})      
-    }
-    res.json(course);
+    //     return res.status(404).json({mas:"Cources Nout Found"})      
+    // }
+    
+    res.json(result.rows);
     res.end();
 }
 
