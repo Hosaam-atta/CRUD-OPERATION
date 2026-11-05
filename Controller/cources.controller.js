@@ -125,7 +125,7 @@ const UpdateOnCource = async (req , res)=>{
      ///  update on course bu mongoosDB 
      try{
      const CourceId = req.params.CourseId;
-     const UpdatedCource =  await  cource.findByIdAndUpdate(CourceId , {$set:{...req.body}  })
+     const UpdatedCource =  await  cource.updateOne({_id:CourceId} , {$set:{...req.body}  })
      res.json(UpdatedCource)
      }catch(e){
         res.status(401).json("Finding Error In Update")
@@ -146,7 +146,12 @@ const DeletCourse= async  (req , res )=>{
     // const course = Courses.filter((co)=> co.id != CoursesId );
     // res.json(course)
 
-      
+    const DeletId =  req.params.CourseId
+    const AfterDelet =  await cource.deleteOne({_id:DeletId});
+    res.status(200).json({ 
+        success:true ,
+        mass:AfterDelet
+    })
 }
 
 module.exports= {
