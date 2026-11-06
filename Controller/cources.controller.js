@@ -19,7 +19,7 @@ const cource= require('../models/cource.model')
 
 const handdleAsyncfn = require("../middlewares/handelerror")
 
-const GetAllCourses =  async ( req , res )=>{
+const GetAllCourses =handdleAsyncfn(  async ( req , res )=>{
     const query = req.query;
     console.log(query);
     
@@ -36,7 +36,7 @@ const GetAllCourses =  async ( req , res )=>{
 
         // get all cources by mongoosDB
     
-}
+})
 
 const GetSingleCourse = handdleAsyncfn(
     async (req ,res , next)=>{

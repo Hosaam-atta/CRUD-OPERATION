@@ -6,10 +6,12 @@ const corse = require("cors")
 
 app.use(express.json()) 
 const CoursesRouter = require('./Router/router.courses');
+const usersRouter = require('./Router/router.users')
 app.use(corse()); // open the blocked connectio between back and fron end
+
 app.use('/api/Courses' , CoursesRouter)
-
-
+app.use('/api/users' , usersRouter )
+    
 
 //  global  middlewares for handle route
 app.all( "/{*any}" , (req ,res)=>{
