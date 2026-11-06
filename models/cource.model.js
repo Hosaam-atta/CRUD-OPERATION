@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const { types } = require('pg')
+// const { types } = require('pg')
 
 const courceSchema = new mongoose.Schema( { 
     title:{

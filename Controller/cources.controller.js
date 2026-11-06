@@ -1,9 +1,11 @@
-const {body , validationResult, param} = require("express-validator")
-let {Courses} = require('../data/Cources')
+// const {body , validationResult, param} = require("express-validator")
+// let {Courses} = require('../data/Cources')
 // const pool = require('../database/dp')
+const httpstatus = require('../utils/httpstatus')
+require('dotenv').config;
 
 const mongoose = require('mongoose')
-const url ="mongodb+srv://hosaamatta4_db_user:WPgRId0TAxC5hPM4@learn-mogodb.b9j9ahs.mongodb.net/Learn-Mongo"
+const url = process.env.MONGOO_URL
 mongoose.connect(url).then( ()=>{
 
     
@@ -11,23 +13,57 @@ console.log("Connect mongose is success");
 
 } )
 
+let error = new Error();
+
 const cource= require('../models/cource.model')
 
+const handdleAsyncfn = require("../middlewares/handelerror")
 
+const GetAllCourses =  async ( req , res )=>{
+    const query = req.query;
+    console.log(query);
+    
+    const limit = req.query.limit;
+    const page = req.query.page;
+    const skip = (page -1 ) * limit;
 
-const GetAllCourses = async (req ,res)=>{
-
+    const cources = await cource.find().limit(limit).skip(skip)
+    res.json({status:"success" , data : {cources}})
 
                 // using Postgresql
     //  const result = await pool.query("SELECT * FROM COURSE");
     // res.json(result.rows)
 
         // get all cources by mongoosDB
-    const cources = await cource.find()
-    res.json(cources)
+    
 }
 
-const GetSingleCourse = async (req ,res)=>{
+const GetSingleCourse = handdleAsyncfn(
+    async (req ,res , next)=>{
+
+        const getcource = await cource.findById(req.params.CourseId) 
+        if (!getcource) {
+            error.message =" Not Found Cource" ;
+            error.statusCode = 404;
+            return next(error);
+            
+        }
+            res.json({status: httpstatus.success , data:{getcource}})
+
+
+
+          // GET SINGLE COURCE BU  MONGOOSDB
+
+            // try{
+                
+            // }catch(e)
+            // {
+            //     console.log("Finding Error " , e);
+            //     res.status(404).json({ 
+            //         status:httpstatus.Fail ,
+            //         data:{cource :"null"}
+            //     })
+            // }
 
     // const course = Courses.find((co)=> co.id === CoursesId );s
             
@@ -47,30 +83,25 @@ const GetSingleCourse = async (req ,res)=>{
 //     }
 
 
-             // GET SINGLE COURCE BU  MONGOOSDB
-
-            
-            try{
-                const getcource = await cource.findById(req.params.CourseId) 
-                res.json(getcource)
-
-
-            }catch(e)
-            {
-                console.log("Finding Error " , e);
-                res.status(404).json({ 
-                    mass:"Finding Error" ,
-                    data:e
-                })
-                
-
-
-            }
+           
     
-}
+})
 
 
-const CreateNewCourse = async (req ,res)=>{
+const CreateNewCourse =handdleAsyncfn( 
+    async (req ,res , next)=>{
+
+        const AddCource =  new cource(req.body)
+        await AddCource.save()
+        res.status(201).json({status:httpstatus.success ,data:AddCource})
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            error.message =" can not add cource" ;
+            return next(error);
+       
+         }
+
+
     //   try{
     //      console.log(req.body);
     //    const errors = validationResult(req);
@@ -105,12 +136,19 @@ const CreateNewCourse = async (req ,res)=>{
 
      // add cource by using mongoosDB 
 
-       const AddCource =  new cource(req.body)
-       await AddCource.save()
-       res.status(201).json(AddCource)
-}
+ 
+})
 
-const UpdateOnCource = async (req , res)=>{
+
+const UpdateOnCource = handdleAsyncfn(
+    async (req , res , next)=>{
+
+     const CourceId = req.params.CourseId;
+     const UpdatedCource =  await  cource.updateOne({_id:CourceId} , {$set:{...req.body}  })
+
+     res.json({status : httpstatus.success , data: {UpdatedCource}})
+
+
     // const CoursesId = +req.params.CourseId;
     //  const course = Courses.find((co)=> co.id === CoursesId );
 
@@ -123,18 +161,21 @@ const UpdateOnCource = async (req , res)=>{
     // res.end();
 
      ///  update on course bu mongoosDB 
-     try{
-     const CourceId = req.params.CourseId;
-     const UpdatedCource =  await  cource.updateOne({_id:CourceId} , {$set:{...req.body}  })
-     res.json(UpdatedCource)
-     }catch(e){
-        res.status(401).json("Finding Error In Update")
-     }
+    //  try{
+    //  const CourceId = req.params.CourseId;
+    //  const UpdatedCource =  await  cource.updateOne({_id:CourceId} , {$set:{...req.body}  })
+    //  res.json({status : httpstatus.success , data: {UpdatedCource}})
+    //  }catch(e){
+    //     res.status(401).json({status:httpstatus.Fail , data:{cources:null}})
+    //  }
 
 
 } 
+)
 
-const DeletCourse= async  (req , res )=>{
+
+const DeletCourse= handdleAsyncfn(
+    async  (req , res )=>{
 
 
 
@@ -150,9 +191,11 @@ const DeletCourse= async  (req , res )=>{
     const AfterDelet =  await cource.deleteOne({_id:DeletId});
     res.status(200).json({ 
         success:true ,
-        mass:AfterDelet
+        data:null
     })
 }
+)
+
 
 module.exports= {
     GetAllCourses ,
