@@ -5,10 +5,9 @@ require("dotenv").config();
 
 const router = express.Router();  // mini express app 
 const userController = require("../Controller/users.controller");
-const { success } = require("../utils/httpstatus");
-
+const verifyauth = require("../middlewares/verifyauth")
 router.route('/')
-.get(userController.getalluser)
+.get(verifyauth , userController.getalluser)
 
 
 

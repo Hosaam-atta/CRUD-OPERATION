@@ -4,6 +4,7 @@ require("dotenv").config();
 const httpstatus = require("./utils/httpstatus")
 const corse = require("cors")
 
+
 app.use(express.json()) 
 const CoursesRouter = require('./Router/router.courses');
 const usersRouter = require('./Router/router.users')
