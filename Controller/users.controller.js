@@ -27,8 +27,8 @@ const getalluser = handdleAsyncfn( async ( req , res )=>{
  })
 
 const register = handdleAsyncfn( 
-    async (req ,  res )=>{
-    const {firstName ,lastName ,email ,password} = new users(req.body)
+    async (req ,  res , next)=>{
+    const {firstName ,lastName ,email ,password , role} = new users(req.body)
     const olduser =await users.findOne({email:email})
     if(olduser){
         res.status(400).json({success:"faild",massage:"The Email Is already exit or dublicated"})
@@ -42,10 +42,13 @@ const register = handdleAsyncfn(
         firstName
         ,lastName
         ,email
-        ,password:hashpassword  })
+        ,password:hashpassword  
+        ,role 
+})
 
-        const userJwt = await generatJWT({email:user.email , id:user._id})
+        const userJwt = await generatJWT({email:user.email , id:user._id , role:user.role})
         user.token = userJwt;
+
         await user.save();
 
     res.status(201).json({success:"true" , data:{user}})
@@ -66,7 +69,7 @@ const login = handdleAsyncfn(
         const compareuser = await bcrypt.compare(password , user.password);
 
         if(user && compareuser){
-            const token = await generatJWT({email:user.email , id:user._id})
+            const token = await generatJWT({email:user.email , id:user._id , role:user.role})
             res.status(200).json({  status:httpstatus.success ,massage:{token}})
         }else{
             res.status(200).json({ success:httpstatus.Fail ,massage:"password not currect "})

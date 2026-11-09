@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const { success } = require("../utils/httpstatus");
 const  httpstatus = require("../utils/httpstatus")
 
 const verifyauth = (req , res , next)=>{
@@ -10,7 +9,9 @@ const verifyauth = (req , res , next)=>{
     }
 
    try{
-     jwt.verify(authheader , process.env.TOKEN_SECRIT_KEY)
+     const currentuser= jwt.verify(authheader , process.env.TOKEN_SECRIT_KEY)
+     req.currentuser = currentuser ;
+     
      next();
    }catch(e){
     res.status(401).json({success:httpstatus.Fail ,mass:e.message })

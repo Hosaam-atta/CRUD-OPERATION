@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+const Role_user = require("../utils/userallow");
 
 const userSchema = new mongoose.Schema({
 
@@ -36,6 +37,11 @@ const userSchema = new mongoose.Schema({
     },
     token:{
         type:"String"
+    },
+    role:{
+        type:String,
+        enum:[Role_user.ADMIN , Role_user.manger ,Role_user.user],
+        default:Role_user.user
     }
 
 });
