@@ -42,6 +42,9 @@ const userSchema = new mongoose.Schema({
         type:String,
         enum:[Role_user.ADMIN , Role_user.manger ,Role_user.user],
         default:Role_user.user
+    },
+    avatar:{
+     type:"string"
     }
 
 });
